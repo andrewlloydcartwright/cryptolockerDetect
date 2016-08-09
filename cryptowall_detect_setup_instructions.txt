@@ -1,0 +1,15 @@
+Directions to set up:
+
+If necessary/enabled in your OS, after downloading, right click properties and Unblock.
+Configure the variables needed in the script (computername in particular, SMTP, EmailTo, EmailFrom, etc. These can be included as imported paramters from .bat file that follows.
+Create a .bat file containing a call to the script in its location:
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NoProfile  -Command "\\contoso.com\readonlyscriptsshare\powershell\Cryptowall\cryptowallscan.ps1 -ComputerName @() -ExplicitUNCList @(\"\\netappflr01\pubacct\Ashley\",\"\\netappflr01\puball\a\")"
+
+or: powershell.exe -ExecutionPolicy Bypass -NoLogo -NoProfile  -Command "\\contoso.com\readonlyscriptsshare\powershell\Cryptowall\cryptowallscan.ps1 -ComputerName @("fileserver01","winhomedirectories")
+
+or: powershell.exe -ExecutionPolicy Bypass -NoLogo -NoProfile  -Command "\\contoso.com\readonlyscriptsshare\powershell\Cryptowall\cryptowallscan.ps1 -ComputerName @("fileserver01","winhomedirectories") -ExplicitUNCList @(\"\\contoso.com\dfsny\Accounting Files\",\"\\netappflr01\puball\a\")"
+
+When passing the array of ComputerName or ExplicitUNCList and writing in .bat, escape " in the array itself @("example","item2") as @(\"example\",\"item2\"), when calling direct in PowerShell you do not need to do this. The entire -command in .bat is surrounded by standard quotes "" that are not escaped.
+
+Open Task Scheduler, create a new task pointing to the above .bat file just saved. Go into the advanced properties and configure the task to run hourly, or every few hours. Configure to run regardless of if user is logged on. Configure the task to 'run a new instance IN PARALLEL' if existing instances are already running.  Recommended: check the "hidden" box to prevent the .bat file from displaying, but perhaps only after running a few times to see how long the scan runs for, validate it works, etc.  If this is a server OS or UAC is enabled, be sure to select the run with "Highest Privilege" option.
+Create a test file "HOW_DECRYPT.TXT" in a share that is being scanned to verify the alert is received. Note: The "record" of a file being found is stored by the script, so generally you will not receive an alert for the same file twice.
